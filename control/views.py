@@ -1,12 +1,19 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.http import FileResponse
+from django.http import HttpResponse
+from django.http import JsonResponse
 from rest_framework import status
 from . rosbag_utils.main import * 
 from django.conf import settings
 import os
+from datetime import datetime
+import os
 
+FOLDER_RECORD_PATH = os.path.join(settings.BASE_DIR, 'control', 'videos')
 PATH_FILE = os.path.join(settings.BASE_DIR, 'control', 'rosbag_utils', 'start-zed2i-camera.sh') 
+
 
 @api_view(['POST'])
 def start_camera(request):
@@ -51,11 +58,6 @@ def stop_record(request):
     except Exception as e:
         return Response({'message' : f'Ocurrio un error : {str(e)}'})
 
-
-from datetime import datetime
-
-FOLDER_RECORD_PATH = os.path.join(settings.BASE_DIR, 'control', 'videos')
-
 @api_view(['POST'])
 def play_record(request):
     try:
@@ -79,18 +81,27 @@ def download_record(request):
     except Exception as e:
         return Response({'message' : f'Ocurrio un error : {str(e)}'})
 
-from django.http import JsonResponse
-import os
 
 @api_view(['GET'])
 def list_recorded_files(request):
-    videos_folder = FOLDER_RECORD_PATH  # Replace with the actual path to the 'videos' folder
-    
+    videos_folder = FOLDER_RECORD_PATH 
     try:
-        # Get a list of all files in the folder
         files = [f for f in os.listdir(videos_folder) 
                  if os.path.isfile(os.path.join(videos_folder, f))]
         return JsonResponse({'files': files})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET'])
+def download_bag_file(request, file_name):
+
+    file_path = os.path.join(FOLDER_RECORD_PATH, file_name)
+    print(f'el archivo : {file_path}')
+    if os.path.exists(file_path):
+        print('el archivo existe') 
+        return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=file_name)
+    else:
+        return HttpResponse("File not found", status=404)
+
 
