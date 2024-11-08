@@ -38,21 +38,14 @@ def execute_bash(command, wait=True):
 
 
 # SE USA
-def record_bagfile(topics, date, test_number, description, duration=None):
-    """
-    Records a ROS bag file for the specified topics and assigns a static node name.
-    
-    Parameters:
-    - topics: List of ROS topics to record (e.g., ['/topic1', '/topic2'])
-    - date: Date for bag file naming (e.g., '24-10-12')
-    - test_number: The test number for the naming convention.
-    - description: A short description for the test (e.g., 'detection-test').
-    - duration: Optional duration in seconds for the recording to stop automatically.
-    
-    Returns:
-    - process: The Popen process object to control the recording.
-    """
-    bagfile_name = f"{description}_{test_number}_{date}.bag" 
+from datetime import datetime
+import os
+
+def record_bagfile(topics, name, basedir, duration=None):
+
+    filepath = os.path.join(basedir, name)
+
+    bagfile_name = f"{filepath}" 
     topics_str = ' '.join(topics)    
     duration_option = f"--duration={duration}" if duration else "" 
     command = f"rosbag record -O {bagfile_name} {topics_str} {duration_option} __name:=rosbag_record" 
