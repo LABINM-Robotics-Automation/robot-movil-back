@@ -3,9 +3,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from . rosbag_utils.main import * 
+from django.conf import settings
+import os
 
-PATH_FILE = '/home/pqbas/labinm/robot-movil-back/robot_movil_back/control/rosbag_utils/start-zed2i-camera.sh' 
-     
+PATH_FILE = os.path.join(settings.BASE_DIR, 'control', 'rosbag_utils', 'start-zed2i-camera.sh') 
+
 @api_view(['POST'])
 def start_camera(request):
     try:
@@ -29,10 +31,11 @@ def stop_camera(request):
 @api_view(['POST'])
 def start_record(request):
     try:
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
         process = record_bagfile(topics=['/zed2i/zed_node/rgb_raw/image_raw_color'], 
-                                 date='24-10-12',
-                                 test_number='1', 
-                                 description='detection-test')
+                                 name=f'{date}.bag',
+                                 basedir = os.path.join(settings.BASE_DIR,'control','videos'))
 
         return Response({'mensaje': f"Zed2i iniciada en proceso {process}"}, status=200)
     except Exception as e: 
@@ -49,11 +52,16 @@ def stop_record(request):
         return Response({'message' : f'Ocurrio un error : {str(e)}'})
 
 
-RECORD_PATH = '/home/pqbas/labinm/robot-movil-back/robot_movil_back/detection-test_1_24-10-12.bag'
+from datetime import datetime
+
+FOLDER_RECORD_PATH = os.path.join(settings.BASE_DIR, 'control', 'videos')
+
 @api_view(['POST'])
 def play_record(request):
-    try:        
-        play_bagfile(bagfile_name=RECORD_PATH, 
+    try:
+        date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+        play_bagfile(bagfile_name=os.path.join(FOLDER_RECORD_PATH, f'{date}.bag'), 
                      loop=False, 
                      rate=1.0, 
                      start_time=0.0, 
@@ -70,3 +78,19 @@ def download_record(request):
         print('Descargando bagfile')
     except Exception as e:
         return Response({'message' : f'Ocurrio un error : {str(e)}'})
+
+from django.http import JsonResponse
+import os
+
+@api_view(['GET'])
+def list_recorded_files(request):
+    videos_folder = FOLDER_RECORD_PATH  # Replace with the actual path to the 'videos' folder
+    
+    try:
+        # Get a list of all files in the folder
+        files = [f for f in os.listdir(videos_folder) 
+                 if os.path.isfile(os.path.join(videos_folder, f))]
+        return JsonResponse({'files': files})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
