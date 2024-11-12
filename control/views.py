@@ -104,4 +104,12 @@ def download_bag_file(request, file_name):
     else:
         return HttpResponse("File not found", status=404)
 
+@api_view(['DELETE'])
+def delete_file(request, file_name):
+    file_path = os.path.join(FOLDER_RECORD_PATH, file_name)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        return JsonResponse({'message': 'File deleted successfully'})
+    else:
+        return JsonResponse({'error': 'File not found'}, status=404)
 
