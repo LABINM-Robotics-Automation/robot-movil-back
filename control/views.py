@@ -30,7 +30,7 @@ def start_camera(request):
 @api_view(['POST'])
 def stop_camera(request):
     try:
-        execute_bash('rosnode kill /zed2i/zed_node')
+        execute_bash('rosnode kill /zed2/zed_node')
         return Response({'mensaje': f"Zed2i stopped"},status=200)
 
     except Exception as e: 
