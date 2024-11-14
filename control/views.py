@@ -20,7 +20,7 @@ def start_camera(request):
     try:
         # camera_process = execute_bash(PATH_FILE, wait=False)
 
-        execute_bash('roslaunch zed_wrapper zed2.launch', wait=False)
+        execute_bash('/opt/ros/noetic/bin/roslaunch zed_wrapper zed2.launch', wait=False)
         return Response({'mensaje': f"Zed2i iniciada en proceso"}, status=200)
 
     except Exception as e: 
