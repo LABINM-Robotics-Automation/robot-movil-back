@@ -18,8 +18,10 @@ PATH_FILE = os.path.join(settings.BASE_DIR, 'control', 'rosbag_utils', 'start-ze
 @api_view(['POST'])
 def start_camera(request):
     try:
-        camera_process = execute_bash(PATH_FILE, wait=False)
-        return Response({'mensaje': f"Zed2i iniciada en proceso {camera_process}"}, status=200)
+        # camera_process = execute_bash(PATH_FILE, wait=False)
+
+        execute_bash('roslaunch zed_wrapper zed2.launch', wait=False)
+        return Response({'mensaje': f"Zed2i iniciada en proceso"}, status=200)
 
     except Exception as e: 
         return Response({ 'mensaje' : f"Ocurrrió un error: {str(e)}" }, status=500)
