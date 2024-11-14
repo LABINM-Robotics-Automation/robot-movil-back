@@ -31,7 +31,8 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Add your frontend's URL here
-    '*'
+    '*',
+    "http://192.168.0.10:5173",  # Replace with your React frontend's URL
 ]
 
 # Application definition
