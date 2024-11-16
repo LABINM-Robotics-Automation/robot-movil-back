@@ -20,7 +20,7 @@ def start_camera(request):
     try:
         # camera_process = execute_bash(PATH_FILE, wait=False)
 
-        execute_bash('/opt/ros/noetic/bin/roslaunch zed_wrapper zed2.launch', wait=False)
+        execute_bash('/opt/ros/noetic/bin/roslaunch zed_wrapper zed2i.launch', wait=False)
         return Response({'mensaje': f"Zed2i iniciada en proceso"}, status=200)
 
     except Exception as e: 
@@ -30,7 +30,7 @@ def start_camera(request):
 @api_view(['POST'])
 def stop_camera(request):
     try:
-        execute_bash('rosnode kill /zed2/zed_node')
+        execute_bash('rosnode kill /zed2i/zed_node')
         return Response({'mensaje': f"Zed2i stopped"},status=200)
 
     except Exception as e: 
