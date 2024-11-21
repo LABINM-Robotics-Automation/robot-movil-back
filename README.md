@@ -9,6 +9,9 @@ Backend for the robot movil, ubild over **Django** framework.
 git clone https://github.com/LABINM-Robotics-Automation/robot-movil-back.git
 cd robot-movil-back
 
+# Activate the enviroment
+source ./venv/bin/activate
+
 # execute the backend
 python manage.py runserver
 ```

@@ -9,8 +9,7 @@ urlpatterns = [
     path('stop_record', views.stop_record, name='stop_record'),
     path('play_record', views.play_record, name='play_record'),
     path('list_files/', views.list_recorded_files, name='list_recorded_files'),
-    path('download/<str:file_name>/', views.download_bag_file, name='download_bag_file')
-    # path('zed_image', ZedImageView.as_view(), name='zed_image')
-    # path('zed_image', views.zed_image, name='zed_image')
+    path('download/<str:file_name>/', views.download_bag_file, name='download_bag_file'),
+    path('delete/<str:file_name>/', views.delete_file, name='delete_file')
 ]
 
