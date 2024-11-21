@@ -36,11 +36,22 @@ def stop_camera(request):
     except Exception as e: 
         return Response({'mensaje' : f"Ocurrrió un error: {str(e)}"}, status=500)
 
+from pathlib import Path
+
+def create_directory_if_not_exists(directory_path):
+    # Create a Path object
+    directory = Path(directory_path)
+    # Create the directory if it doesn't exist
+    directory.mkdir(parents=True, exist_ok=True)
+    print(f"Directory '{directory_path}' is ensured to exist.")
+
 
 @api_view(['POST'])
 def start_record(request):
     try:
         date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+        create_directory_if_not_exists(os.path.join(settings.BASE_DIR,'control','videos'))
 
         process = record_bagfile(topics=['/zed2i/zed_node/rgb_raw/image_raw_color'], 
                                  name=f'{date}.bag',
