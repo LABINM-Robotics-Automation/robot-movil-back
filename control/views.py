@@ -10,6 +10,9 @@ from django.conf import settings
 import os
 from datetime import datetime
 import os
+from django.http import JsonResponse
+from .ros_utils.rosbridge_websocket_manager import RosWebsocketManager  
+
 
 FOLDER_RECORD_PATH = os.path.join(settings.BASE_DIR, 'control', 'videos')
 PATH_FILE = os.path.join(settings.BASE_DIR, 'control', 'rosbag_utils', 'start-zed2i-camera.sh') 
@@ -19,8 +22,10 @@ PATH_FILE = os.path.join(settings.BASE_DIR, 'control', 'rosbag_utils', 'start-ze
 def start_camera(request):
     try:
         # camera_process = execute_bash(PATH_FILE, wait=False)
-
-        execute_bash('/opt/ros/noetic/bin/roslaunch zed_wrapper zed2i.launch', wait=False)
+        # execute_bash('/opt/ros/noetic/bin/roslaunch zed_wrapper zed2i.launch', wait=False)
+        command = 'roslaunch zed_wrapper zed2i.launch'
+        session_name = 'zed-camera'
+        run_on_tmux_session(session_name, command, server)
         return Response({'mensaje': f"Zed2i iniciada en proceso"}, status=200)
 
     except Exception as e: 
@@ -30,11 +35,40 @@ def start_camera(request):
 @api_view(['POST'])
 def stop_camera(request):
     try:
-        execute_bash('rosnode kill /zed2i/zed_node')
+        session_name = 'zed-camera'
+        stop_tmux_session(session_name, server)
         return Response({'mensaje': f"Zed2i stopped"},status=200)
 
     except Exception as e: 
         return Response({'mensaje' : f"Ocurrrió un error: {str(e)}"}, status=500)
+
+
+@api_view(['POST'])
+def start_image_processor(request):
+    try:
+        command = 'rosrun mobile_robot_iot image2compressedImage.py __name:=image_processor'
+        session_name = 'image-processor'
+        run_on_tmux_session(session_name, command, server)
+        return Response({'mensaje': f"image processor iniciada en proceso"}, status=200)
+
+    except Exception as e: 
+        return Response({ 'mensaje' : f"Ocurrrió un error: {str(e)}" }, status=500)
+
+
+server = libtmux.Server()
+
+@api_view(['POST'])
+def stop_image_processor(request):
+    try:
+        session_name = 'image-processor'
+        stop_tmux_session(session_name, server)
+        return Response({'mensaje': f"image processor stopped"},status=200)
+
+    except Exception as e:
+        print(e)
+        return Response({'mensaje' : f"Ocurrrió un error: {str(e)}"}, status=500)
+
+
 
 from pathlib import Path
 
@@ -70,6 +104,7 @@ def stop_record(request):
 
     except Exception as e:
         return Response({'message' : f'Ocurrio un error : {str(e)}'})
+
 
 @api_view(['POST'])
 def play_record(request):
@@ -125,4 +160,29 @@ def delete_file(request, file_name):
         return JsonResponse({'message': 'File deleted successfully'})
     else:
         return JsonResponse({'error': 'File not found'}, status=404)
+
+
+# ros_websocket_manager = RosWebsocketManager()
+
+
+@api_view(['POST'])
+def start_roslaunch(request):
+    print('accessed')
+    # result = ros_websocket_manager.start_roslaunch()
+    session_name = 'websocket-server'
+    command = 'roslaunch rosbridge_server rosbridge_websocket.launch'
+    result = run_on_tmux_session(session_name, command, server)
+    # print(result)
+    # ros
+    return JsonResponse({"message": result})
+
+
+@api_view(['POST'])
+def stop_roslaunch(request):
+    # print('accessed')
+    # result = ros_websocket_manager.stop_roslaunch()
+    # print(result)
+    session_name = 'websocket-server'
+    stop_tmux_session(session_name, server)
+    return JsonResponse({"message": result})
 
