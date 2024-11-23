@@ -46,7 +46,8 @@ def stop_camera(request):
 @api_view(['POST'])
 def start_image_processor(request):
     try:
-        command = 'rosrun mobile_robot_iot image2compressedImage.py __name:=image_processor'
+        # command = 'rosrun mobile_robot_iot image2compressedImage.py __name:=image_processor'
+        command = 'rosrun blueberry-detection-ros image2compressedImage.py __name:=image_processor'
         session_name = 'image-processor'
         run_on_tmux_session(session_name, command, server)
         return Response({'mensaje': f"image processor iniciada en proceso"}, status=200)
