@@ -126,6 +126,7 @@ def run_on_tmux_session(session_name, command, server):
     pane.send_keys("export PATH=/usr/bin:/bin:/usr/sbin:/sbin")
     pane.send_keys("unset PYTHONPATH")
     pane.send_keys("noetic")
+    pane.send_keys("source ~/.bashrc")
     pane.send_keys(command)  # Run the desired command
 
     print(f"Tmux session '{session_name}' created and command sent.")
