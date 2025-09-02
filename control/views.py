@@ -103,7 +103,7 @@ def start_record(request):
 
         pane.send_keys("export PATH=/usr/bin:/bin:/usr/sbin:/sbin")
         pane.send_keys("unset PYTHONPATH")
-        pane.send_keys("noetic")
+        # pane.send_keys("noetic")
         pane.send_keys("source ~/.bashrc")
 
 
@@ -137,7 +137,7 @@ def stop_record(request):
         pane = window.attached_pane
         pane.send_keys("export PATH=/usr/bin:/bin:/usr/sbin:/sbin")
         pane.send_keys("unset PYTHONPATH")
-        pane.send_keys("noetic")
+        # pane.send_keys("noetic")
         pane.send_keys("source ~/.bashrc")
 
         result = pane.send_keys("rosnode kill rosbag_record")
@@ -263,7 +263,7 @@ def convert_to_mp4(request, file_name):
 
         # Build command to execute the conversion script with ROS environment
         script_path = os.path.join(settings.BASE_DIR, 'control', 'rosbag_utils', 'convert_bag_to_mp4.py')
-        command = f'noetic && python3 {script_path} --bag-file {bag_file_path} --output-file {mp4_file_path}'
+        command = f'python3 {script_path} --bag-file {bag_file_path} --output-file {mp4_file_path}'
 
         # Use fixed session name for all conversions
         session_name = 'convert-bag-to-mp4-process'
