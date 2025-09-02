@@ -114,8 +114,27 @@ def run_on_tmux_session(session_name, command, server):
     # Check if the session already exists
     session = server.find_where({"session_name": session_name})
     if session:
-        print(f"Tmux session '{session_name}' already exists.")
-        return
+        # Check if there are active processes in the session
+        try:
+            window = session.attached_window
+            pane = window.attached_pane
+
+            # Check if pane has active processes
+            if pane.is_alive and pane.pid is not None:
+                # Process still active - don't start new one
+                print(f"Process already running in session '{session_name}'")
+                return None  # Return None to indicate session already exists
+            else:
+                # Session exists but process is dead - clean up and continue
+                print(f"Cleaning up dead session '{session_name}'")
+                session.kill_session()
+        except Exception as e:
+            # Error checking session - assume it's dead and clean up
+            print(f"Error checking session '{session_name}': {e}")
+            try:
+                session.kill_session()
+            except:
+                pass
 
     # Create a new session
     session = server.new_session(session_name=session_name, kill_session=True, attach=False)
@@ -130,6 +149,7 @@ def run_on_tmux_session(session_name, command, server):
     pane.send_keys(command)  # Run the desired command
 
     print(f"Tmux session '{session_name}' created and command sent.")
+    return True  # Return True to indicate new session was created
 
 
 def stop_tmux_session(session_name, server):
